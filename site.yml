@@ -4,15 +4,15 @@
   handlers:
     - name: Start clickhouse service
       become: true
-      ansible.builtin.service:
-        name: clickhouse-server
-        state: restarted
+      become_method: enable
+      ansible.builtin.command: "cd bin && clickhouse-server"
   tasks:
     - name: Get clickhouse distrib
       block:
         - name: Get clickhouse distrib
           ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
+#            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.x86_64.rpm"
             dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
           with_items: "{{ clickhouse_packages }}"
       rescue:
@@ -29,8 +29,11 @@
           - clickhouse-client-{{ clickhouse_version }}.rpm
           - clickhouse-server-{{ clickhouse_version }}.rpm
           - clickhouse-common-static-{{ clickhouse_version }}.rpm
+      changed_when: true
       notify: Start clickhouse service
-    - name: Create database
+    - name: Flush clickhouse handlers
+      ansible.builtin.meta: flush_handlers
+    - name: Create clickhouse database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc !=82
@@ -40,9 +43,8 @@
   handlers:
     - name: Start Vector service
       become: true
-      ansible.builtin.service:
-        name: vector
-        state: restarted
+      become_method: enable
+      ansible.builtin.command: "cd bin && vector"
   tasks:
     - name: Vector download packages
       ansible.builtin.get_url:
@@ -65,15 +67,15 @@
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid }}"
         validate: vector validate --no-environment --config-yaml %s
-    - name: Vector change systemd unit
+    - name: Change vector system unit
       become: true
       become_method: enable
       ansible.builtin.template:
-        use_backend: yum
         src: vector.service.j2
         dest: /usr/lib/systemd/system/vector.service
         mode: "0644"
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_gid }}"
         backup: true
+      changed_when: true
       notify: Start Vector service
