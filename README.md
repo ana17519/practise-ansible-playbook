@@ -14,15 +14,15 @@
 
 **Inventory файл**
 
-Группа `clickhouse` состоит из хоста `centos7` и метод коннекта `docker`
+Группа `clickhouse` состоит из хоста `centos7` и метод коннекта `docker`.
 
-Группа `vector` состоит из хоста `centos7` и метод коннекта `docker`
+Группа `vector` состоит из хоста `centos7` и метод коннекта `docker`.
 
 **Playbook**
 
 Playbook состоит из 2 `play`.
 
-Play `Install Clickhouse` применяется на группу `clickhouse` и предназначен для установки и запуска `Clickhouse`
+Play `Install Clickhouse` применяется на группу `clickhouse` и предназначен для установки и запуска `Clickhouse`.
 
 `handler` для запуска `clickhouse-server`:
 
@@ -41,7 +41,7 @@ Play `Install Clickhouse` применяется на группу `clickhouse` 
 | `Flush clickhouse handlers`   | Добавляем обработчик `Start clickhouse service` для того, чтобы handler выполнился после install task, а не по завершению всех задач. Если пропустить этот этап, то задача создания таблиц завершится ошибкой, тк не запущен clickhouse-server |
 | `Create clickhouse database`             | Создаем в `Clickhouse` БД с названием "logs", добавляем условия `failed_when` и `changed_when`, при которых таск будет иметь состояние `failed` и `changed`                                                                                    |
 
-Play `Install Vector` применяется на группу хостов `Vector` и нужен для установки и запуска `Vector`
+Play `Install Vector` применяется на группу хостов `Vector` и нужен для установки и запуска `Vector`.
 
 `handler` для запуска `vector`:
 
@@ -64,7 +64,7 @@ Play `Install Vector` применяется на группу хостов `Vec
 **Template**
 
 Шаблон `vector.service.j2` нужен для изменения модуля службы `vector`. 
-В нем определяется строка запуска `vector`и есть указание, что unit должен быть запущен под пользователем `ansible`
+В нем определяется строка запуска `vector`и есть указание, что unit должен быть запущен под пользователем `ansible`.
 
 Шаблон `vector.yml.j2` используется для настройки конфига `vector`. 
-В нем указывается, что файл конфига находится в переменной "vector_config" и его надо преобразовать в `YAML`.
+В нем указывается, что файл конфига находится в переменной vector_config и его надо преобразовать в `YAML`.
